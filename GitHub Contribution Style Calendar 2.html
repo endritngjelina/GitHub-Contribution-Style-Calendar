@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Contribution Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #e6edf3;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+            padding: 24px;
+            box-shadow: 0 16px 70px -12px rgba(0, 0, 0, 0.56);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(33, 38, 45, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+        }
+
+        .control-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #f0f6fc;
+            white-space: nowrap;
+        }
+
+        input, select, button {
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(240, 246, 252, 0.2);
+            color: #e6edf3;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: 500;
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+        }
+
+        .theme-btn {
+            background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%);
+        }
+
+        .theme-btn:hover {
+            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(33, 38, 45, 0.6);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #58a6ff;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .calendar-container {
+            background: rgba(33, 38, 45, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        .month-labels {
+            display: flex;
+            margin-bottom: 8px;
+            padding-left: 32px;
+        }
+
+        .month-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            text-align: center;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .calendar-grid {
+            display: flex;
+            gap: 3px;
+        }
+
+        .weekdays {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-right: 8px;
+        }
+
+        .weekday {
+            height: 11px;
+            font-size: 0.6rem;
+            color: #8b949e;
+            display: flex;
+            align-items: center;
+            width: 24px;
+        }
+
+        .weeks {
+            display: flex;
+            gap: 3px;
+        }
+
+        .week {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .day {
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .day:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 0 0 1px rgba(240, 246, 252, 0.3);
+        }
+
+        .day.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 2px #58a6ff;
+        }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: #8b949e;
+        }
+
+        .legend-item {
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(13, 17, 23, 0.95);
+            color: #e6edf3;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(240, 246, 252, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .habit-list {
+            background: rgba(33, 38, 45, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+        }
+
+        .habit-list h3 {
+            margin-bottom: 16px;
+            color: #f0f6fc;
+            font-size: 1.1rem;
+        }
+
+        .habit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(13, 17, 23, 0.6);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .habit-item:hover {
+            background: rgba(33, 38, 45, 0.8);
+            transform: translateX(4px);
+        }
+
+        .habit-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .habit-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid rgba(240, 246, 252, 0.2);
+        }
+
+        .habit-name {
+            font-weight: 500;
+        }
+
+        .habit-streak {
+            font-size: 0.75rem;
+            color: #8b949e;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .delete-btn {
+            background: #da3633;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background: #f85149;
+            transform: scale(1.05);
+        }
+
+        .add-habit {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .add-habit input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .export-section {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #bc8cff 0%, #d2a8ff 100%);
+            margin: 0 8px;
+        }
+
+        .export-btn:hover {
+            box-shadow: 0 4px 12px rgba(188, 140, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                justify-content: space-between;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .add-habit {
+                flex-direction: column;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .glow {
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(88, 166, 255, 0.2); }
+            to { box-shadow: 0 0 20px rgba(88, 166, 255, 0.4); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Professional Contribution Calendar</h1>
+            <p class="subtitle">Track your habits and achievements with style</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="year">Year:</label>
+                <select id="year"></select>
+            </div>
+            <div class="control-group">
+                <label for="intensity">Intensity:</label>
+                <input type="range" id="intensity" min="0" max="4" value="0">
+                <span id="intensityValue">0</span>
+            </div>
+            <div class="control-group">
+                <label for="habit">Active Habit:</label>
+                <select id="habit">
+                    <option value="">Select a habit</option>
+                </select>
+            </div>
+            <button id="themeBtn" class="theme-btn">🎨 Themes</button>
+            <button id="resetBtn">🗑️ Reset Year</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-value" id="totalContributions">0</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="currentStreak">0</span>
+                <span class="stat-label">Current Streak</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="longestStreak">0</span>
+                <span class="stat-label">Longest Streak</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="activeHabits">0</span>
+                <span class="stat-label">Active Habits</span>
+            </div>
+        </div>
+
+        <div class="calendar-container">
+            <div class="month-labels" id="monthLabels"></div>
+            <div class="calendar-grid">
+                <div class="weekdays">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
+                <div class="weeks" id="calendar"></div>
+            </div>
+            <div class="legend">
+                <span>Less</span>
+                <div class="legend-item" style="background-color: #161b22;"></div>
+                <div class="legend-item" style="background-color: #0e4429;"></div>
+                <div class="legend-item" style="background-color: #006d32;"></div>
+                <div class="legend-item" style="background-color: #26a641;"></div>
+                <div class="legend-item" style="background-color: #39d353;"></div>
+                <span>More</span>
+            </div>
+        </div>
+
+        <div class="habit-list">
+            <h3>📋 Your Habits</h3>
+            <div id="habitItems"></div>
+            <div class="add-habit">
+                <input type="text" id="newHabitName" placeholder="Enter new habit name">
+                <input type="color" id="newHabitColor" value="#39d353">
+                <button id="addHabitBtn">➕ Add Habit</button>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <button class="export-btn" id="exportJSON">📄 Export JSON</button>
+            <button class="export-btn" id="exportCSV">📊 Export CSV</button>
+            <button class="export-btn" id="importData">📥 Import Data</button>
+            <input type="file" id="fileInput" style="display: none;" accept=".json,.csv">
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        class ContributionCalendar {
+            constructor() {
+                this.currentYear = new Date().getFullYear();
+                this.data = this.loadData();
+                this.habits = this.loadHabits();
+                this.currentHabit = '';
+                this.themes = {
+                    github: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                    ocean: ['#0c1445', '#1a365d', '#2c5282', '#3182ce', '#63b3ed'],
+                    sunset: ['#2d1b20', '#744210', '#c05621', '#ed8936', '#fbd38d'],
+                    purple: ['#2d1b69', '#553c9a', '#805ad5', '#9f7aea', '#d6bcfa'],
+                    pink: ['#702459', '#97266d', '#d53f8c', '#ed64a6', '#f687b3']
+                };
+                this.currentTheme = 'github';
+                
+                this.initializeElements();
+                this.setupEventListeners();
+                this.renderCalendar();
+                this.renderHabits();
+                this.updateStats();
+            }
+
+            initializeElements() {
+                this.yearSelect = document.getElementById('year');
+                this.intensitySlider = document.getElementById('intensity');
+                this.intensityValue = document.getElementById('intensityValue');
+                this.habitSelect = document.getElementById('habit');
+                this.calendar = document.getElementById('calendar');
+                this.tooltip = document.getElementById('tooltip');
+                
+                // Populate year dropdown
+                for (let year = 2020; year <= new Date().getFullYear() + 1; year++) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    if (year === this.currentYear) option.selected = true;
+                    this.yearSelect.appendChild(option);
+                }
+            }
+
+            setupEventListeners() {
+                this.yearSelect.addEventListener('change', (e) => {
+                    this.currentYear = parseInt(e.target.value);
+                    this.renderCalendar();
+                    this.updateStats();
+                });
+
+                this.intensitySlider.addEventListener('input', (e) => {
+                    this.intensityValue.textContent = e.target.value;
+                });
+
+                this.habitSelect.addEventListener('change', (e) => {
+                    this.currentHabit = e.target.value;
+                });
+
+                document.getElementById('themeBtn').addEventListener('click', () => {
+                    this.cycleTheme();
+                });
+
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    if (confirm('Reset all data for this year? This cannot be undone.')) {
+                        delete this.data[this.currentYear];
+                        this.saveData();
+                        this.renderCalendar();
+                        this.updateStats();
+                    }
+                });
+
+                document.getElementById('addHabitBtn').addEventListener('click', () => {
+                    this.addHabit();
+                });
+
+                document.getElementById('newHabitName').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addHabit();
+                });
+
+                // Export/Import functionality
+                document.getElementById('exportJSON').addEventListener('click', () => {
+                    this.exportData('json');
+                });
+
+                document.getElementById('exportCSV').addEventListener('click', () => {
+                    this.exportData('csv');
+                });
+
+                document.getElementById('importData').addEventListener('click', () => {
+                    document.getElementById('fileInput').click();
+                });
+
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    this.importData(e.target.files[0]);
+                });
+
+                // Tooltip functionality
+                document.addEventListener('mousemove', (e) => {
+                    if (e.target.classList.contains('day')) {
+                        this.showTooltip(e, e.target);
+                    } else {
+                        this.hideTooltip();
+                    }
+                });
+            }
+
+            renderCalendar() {
+                const startDate = new Date(this.currentYear, 0, 1);
+                const endDate = new Date(this.currentYear, 11, 31);
+                
+                // Adjust start date to Sunday
+                const startDay = startDate.getDay();
+                const adjustedStart = new Date(startDate);
+                adjustedStart.setDate(startDate.getDate() - startDay);
+
+                this.calendar.innerHTML = '';
+                this.renderMonthLabels();
+
+                let currentDate = new Date(adjustedStart);
+                const weeks = [];
+                
+                while (currentDate <= endDate || weeks.length < 53) {
+                    const week = document.createElement('div');
+                    week.className = 'week';
+                    
+                    for (let day = 0; day < 7; day++) {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'day';
+                        
+                        const dateStr = this.formatDate(currentDate);
+                        const yearData = this.data[this.currentYear] || {};
+                        const dayData = yearData[dateStr] || { intensity: 0, habits: {} };
+                        
+                        dayElement.dataset.date = dateStr;
+                        dayElement.dataset.intensity = dayData.intensity;
+                        
+                        const colors = this.themes[this.currentTheme];
+                        dayElement.style.backgroundColor = colors[dayData.intensity];
+                        
+                        if (currentDate.getFullYear() !== this.currentYear) {
+                            dayElement.style.opacity = '0.3';
+                        }
+                        
+                        dayElement.addEventListener('click', () => {
+                            this.toggleDay(dateStr);
+                        });
+                        
+                        week.appendChild(dayElement);
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                    
+                    this.calendar.appendChild(week);
+                    weeks.push(week);
+                    
+                    if (currentDate > endDate && weeks.length >= 52) break;
+                }
+            }
+
+            renderMonthLabels() {
+                const monthLabels = document.getElementById('monthLabels');
+                monthLabels.innerHTML = '';
+                
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                months.forEach(month => {
+                    const label = document.createElement('div');
+                    label.className = 'month-label';
+                    label.textContent = month;
+                    monthLabels.appendChild(label);
+                });
+            }
+
+            toggleDay(dateStr) {
+                if (!this.data[this.currentYear]) {
+                    this.data[this.currentYear] = {};
+                }
+                
+                if (!this.data[this.currentYear][dateStr]) {
+                    this.data[this.currentYear][dateStr] = { intensity: 0, habits: {} };
+                }
+                
+                const dayData = this.data[this.currentYear][dateStr];
+                const intensity = parseInt(this.intensitySlider.value);
+                
+                if (this.currentHabit && intensity > 0) {
+                    dayData.habits[this.currentHabit] = intensity;
+                    dayData.intensity = Math.max(dayData.intensity, intensity);
+                } else if (intensity === 0) {
+                    if (this.currentHabit) {
+                        delete dayData.habits[this.currentHabit];
+                    }
+                    // Recalculate intensity based on remaining habits
+                    dayData.intensity = Math.max(0, ...Object.values(dayData.habits));
+                } else {
+                    dayData.intensity = intensity;
+                }
+                
+                this.saveData();
+                this.renderCalendar();
+                this.updateStats();
+            }
+
+            addHabit() {
+                const name = document.getElementById('newHabitName').value.trim();
+                const color = document.getElementById('newHabitColor').value;
+                
+                if (name && !this.habits[name]) {
+                    this.habits[name] = { color, created: new Date().toISOString() };
+                    this.saveHabits();
+                    this.renderHabits();
+                    document.getElementById('newHabitName').value = '';
+                    
+                    // Add pulse animation
+                    const habitItems = document.getElementById('habitItems');
+                    const lastItem = habitItems.lastElementChild;
+                    if (lastItem) {
+                        lastItem.classList.add('pulse');
+                        setTimeout(() => lastItem.classList.remove('pulse'), 2000);
+                    }
+                }
+            }
+
+            renderHabits() {
+                const habitItems = document.getElementById('habitItems');
+                const habitSelect = document.getElementById('habit');
+                
+                habitItems.innerHTML = '';
+                habitSelect.innerHTML = '<option value="">Select a habit</option>';
+                
+                Object.entries(this.habits).forEach(([name, data]) => {
+                    // Habit list item
+                    const item = document.createElement('div');
+                    item.className = 'habit-item';
+                    
+                    const streak = this.calculateHabitStreak(name);
+                    
+                    item.innerHTML = `
+                        <div class="habit-info">
+                            <div class="habit-color" style="background-color: ${data.color}"></div>
+                            <span class="habit-name">${name}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="habit-streak">${streak} day streak</span>
+                            <button class="delete-btn" onclick="calendar.deleteHabit('${name}')">×</button>
+                        </div>
+                    `;
+                    
+                    habitItems.appendChild(item);
+                    
+                    // Habit select option
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    habitSelect.appendChild(option);
+                });
+                
+                this.updateStats();
+            }
+
+            deleteHabit(name) {
+                if (confirm(`Delete habit "${name}"? This will remove all associated data.`)) {
+                    delete this.habits[name];
+                    
+                    // Remove from all calendar data
+                    Object.values(this.data).forEach(yearData => {
+                        Object.values(yearData).forEach(dayData => {
+                            delete dayData.habits[name];
+                            // Recalculate intensity
+                            dayData.intensity = Math.max(0, ...Object.values(dayData.habits));
+                        });
+                    });
+                    
+                    this.saveHabits();
+                    this.saveData();
+                    this.renderHabits();
+                    this.renderCalendar();
+                }
+            }
+
+            calculateHabitStreak(habitName) {
+                const today = new Date();
+                let streak = 0;
+                let currentDate = new Date(today);
+                
+                while (currentDate.getFullYear() >= 2020) {
+                    const dateStr = this.formatDate(currentDate);
+                    const yearData = this.data[currentDate.getFullYear()] || {};
+                    const dayData = yearData[dateStr] || { habits: {} };
+                    
+                    if (dayData.habits[habitName]) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                    
+                    currentDate.setDate(currentDate.getDate() - 1);
+                }
+                
+                return streak;
+            }
+
+            updateStats() {
+                const yearData = this.data[this.currentYear] || {};
+                const days = Object.values(yearData);
+                
+                const total = days.reduce((sum, day) => sum + (day.intensity > 0 ? 1 : 0), 0);
+                const currentStreak = this.calculateCurrentStreak();
+                const longestStreak = this.calculateLongestStreak();
+                const activeHabits = Object.keys(this.habits).length;
+                
+                document.getElementById('totalContributions').textContent = total;
+                document.getElementById('currentStreak').textContent = currentStreak;
+                document.getElementById('longestStreak').textContent = longestStreak;
+                document.getElementById('activeHabits').textContent = activeHabits;
+            }
+
+            calculateCurrentStreak() {
+                const today = new Date();
+                let streak = 0;
+                let currentDate = new Date(today);
+                
+                while (currentDate.getFullYear() >= this.currentYear - 1) {
+                    const dateStr = this.formatDate(currentDate);
+                    const yearData = this.data[currentDate.getFullYear()] || {};
+                    const dayData = yearData[dateStr] || { intensity: 0 };
+                    
+                    if (dayData.intensity > 0) {
+                        streak++;
+                    } else if (streak > 0) {
+                        break;
+                    }
+                    
+                    currentDate.setDate(currentDate.getDate() - 1);
+                }
+                
+                return streak;
+            }
+
+            calculateLongestStreak() {
+                let longest = 0;
+                let current = 0;
+                
+                for (let year = 2020; year <= new Date().getFullYear(); year++) {
+                    const yearData = this.data[year] || {};
+                    const startDate = new Date(year, 0, 1);
+                    const endDate = new Date(year, 11, 31);
+                    
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        const dateStr = this.formatDate(d);
+                        const dayData = yearData[dateStr] || { intensity: 0 };
+                        
+                        if (dayData.intensity > 0) {
+                            current++;
+                            longest = Math.max(longest, current);
+                        } else {
+                            current = 0;
+                        }
+                    }
+                }
+                
+                return longest;
+            }
+
+            cycleTheme() {
+                const themes = Object.keys(this.themes);
+                const currentIndex = themes.indexOf(this.currentTheme);
+                const nextIndex = (currentIndex + 1) % themes.length;
+                this.currentTheme = themes[nextIndex];
+                
+                this.renderCalendar();
+                this.updateLegend();
+                
+                // Add glow effect
+                document.querySelector('.theme-btn').classList.add('glow');
+                setTimeout(() => {
+                    document.querySelector('.theme-btn').classList.remove('glow');
+                }, 3000);
+            }
+
+            updateLegend() {
+                const legendItems = document.querySelectorAll('.legend-item');
+                const colors = this.themes[this.currentTheme];
+                legendItems.forEach((item, index) => {
+                    item.style.backgroundColor = colors[index];
+                });
+            }
+
+            showTooltip(event, dayElement) {
+                const date = dayElement.dataset.date;
+                const intensity = parseInt(dayElement.dataset.intensity);
+                const yearData = this.data[this.currentYear] || {};
+                const dayData = yearData[date] || { intensity: 0, habits: {} };
+                
+                let content = `<strong>${this.formatDisplayDate(date)}</strong><br>`;
+                
+                if (intensity === 0) {
+                    content += 'No contributions';
+                } else {
+                    content += `${intensity} contribution${intensity > 1 ? 's' : ''}<br>`;
+                    
+                    const habits = Object.entries(dayData.habits);
+                    if (habits.length > 0) {
+                        content += '<br><strong>Habits:</strong><br>';
+                        habits.forEach(([habit, level]) => {
+                            const color = this.habits[habit]?.color || '#39d353';
+                            content += `<span style="color: ${color}">● ${habit}</span> (${level})<br>`;
+                        });
+                    }
+                }
+                
+                this.tooltip.innerHTML = content;
+                this.tooltip.style.left = event.pageX + 10 + 'px';
+                this.tooltip.style.top = event.pageY - 10 + 'px';
+                this.tooltip.classList.add('show');
+            }
+
+            hideTooltip() {
+                this.tooltip.classList.remove('show');
+            }
+
+            exportData(format) {
+                const exportData = {
+                    data: this.data,
+                    habits: this.habits,
+                    theme: this.currentTheme,
+                    exported: new Date().toISOString()
+                };
+                
+                if (format === 'json') {
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                    this.downloadFile(blob, `contribution-calendar-${new Date().toISOString().split('T')[0]}.json`);
+                } else if (format === 'csv') {
+                    let csv = 'Date,Intensity,Habits\n';
+                    
+                    Object.entries(this.data).forEach(([year, yearData]) => {
+                        Object.entries(yearData).forEach(([date, dayData]) => {
+                            const habits = Object.keys(dayData.habits).join(';');
+                            csv += `${date},${dayData.intensity},"${habits}"\n`;
+                        });
+                    });
+                    
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    this.downloadFile(blob, `contribution-calendar-${new Date().toISOString().split('T')[0]}.csv`);
+                }
+            }
+
+            downloadFile(blob, filename) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            importData(file) {
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        let importedData;
+                        
+                        if (file.type === 'application/json' || file.name.endsWith('.json')) {
+                            importedData = JSON.parse(e.target.result);
+                            
+                            if (importedData.data) {
+                                this.data = { ...this.data, ...importedData.data };
+                            }
+                            if (importedData.habits) {
+                                this.habits = { ...this.habits, ...importedData.habits };
+                            }
+                            if (importedData.theme) {
+                                this.currentTheme = importedData.theme;
+                            }
+                        } else if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+                            // Simple CSV parsing
+                            const lines = e.target.result.split('\n');
+                            lines.slice(1).forEach(line => {
+                                if (line.trim()) {
+                                    const [date, intensity, habits] = line.split(',');
+                                    const year = new Date(date).getFullYear();
+                                    
+                                    if (!this.data[year]) this.data[year] = {};
+                                    
+                                    this.data[year][date] = {
+                                        intensity: parseInt(intensity) || 0,
+                                        habits: {}
+                                    };
+                                    
+                                    if (habits && habits !== '""') {
+                                        const habitList = habits.replace(/"/g, '').split(';');
+                                        habitList.forEach(habit => {
+                                            if (habit.trim()) {
+                                                this.data[year][date].habits[habit.trim()] = 1;
+                                                if (!this.habits[habit.trim()]) {
+                                                    this.habits[habit.trim()] = {
+                                                        color: '#39d353',
+                                                        created: new Date().toISOString()
+                                                    };
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                        
+                        this.saveData();
+                        this.saveHabits();
+                        this.renderCalendar();
+                        this.renderHabits();
+                        this.updateStats();
+                        this.updateLegend();
+                        
+                        alert('Data imported successfully!');
+                        
+                    } catch (error) {
+                        alert('Error importing data: ' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            }
+
+            formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+
+            formatDisplayDate(dateStr) {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+
+            loadData() {
+                const saved = localStorage.getItem('contributionCalendarData');
+                return saved ? JSON.parse(saved) : {};
+            }
+
+            saveData() {
+                localStorage.setItem('contributionCalendarData', JSON.stringify(this.data));
+            }
+
+            loadHabits() {
+                const saved = localStorage.getItem('contributionCalendarHabits');
+                return saved ? JSON.parse(saved) : {
+                    'Exercise': { color: '#39d353', created: new Date().toISOString() },
+                    'Reading': { color: '#58a6ff', created: new Date().toISOString() },
+                    'Meditation': { color: '#bc8cff', created: new Date().toISOString() }
+                };
+            }
+
+            saveHabits() {
+                localStorage.setItem('contributionCalendarHabits', JSON.stringify(this.habits));
+            }
+        }
+
+        // Initialize the calendar
+        const calendar = new ContributionCalendar();
+
+        // Add some sample data for demonstration
+        function addSampleData() {
+            const today = new Date();
+            const sampleHabits = ['Exercise', 'Reading', 'Meditation'];
+            
+            for (let i = 0; i < 100; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                
+                if (Math.random() > 0.3) { // 70% chance of activity
+                    const year = date.getFullYear();
+                    const dateStr = calendar.formatDate(date);
+                    
+                    if (!calendar.data[year]) calendar.data[year] = {};
+                    
+                    const intensity = Math.floor(Math.random() * 4) + 1;
+                    const habit = sampleHabits[Math.floor(Math.random() * sampleHabits.length)];
+                    
+                    calendar.data[year][dateStr] = {
+                        intensity: intensity,
+                        habits: { [habit]: intensity }
+                    };
+                }
+            }
+            
+            calendar.saveData();
+            calendar.renderCalendar();
+            calendar.updateStats();
+        }
+
+        // Add sample data button (for demonstration)
+        const sampleBtn = document.createElement('button');
+        sampleBtn.textContent = '🎲 Add Sample Data';
+        sampleBtn.className = 'theme-btn';
+        sampleBtn.style.marginLeft = '8px';
+        sampleBtn.onclick = addSampleData;
+        document.querySelector('.controls').appendChild(sampleBtn);
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'e':
+                        e.preventDefault();
+                        calendar.exportData('json');
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        document.getElementById('fileInput').click();
+                        break;
+                    case 't':
+                        e.preventDefault();
+                        calendar.cycleTheme();
+                        break;
+                }
+            }
+        });
+
+        // Add performance monitoring
+        console.log('🚀 Professional Contribution Calendar loaded successfully!');
+        console.log('💡 Keyboard shortcuts: Ctrl+E (export), Ctrl+I (import), Ctrl+T (theme)');
+        console.log('🎨 Available themes:', Object.keys(calendar.themes).join(', '));
+        
+        // Add smooth scrolling for mobile
+        if (window.innerWidth <= 768) {
+            document.body.style.overflowX = 'auto';
+            document.querySelector('.calendar-container').style.overflowX = 'auto';
+        }
+    </script>
+</body>
+</html>
