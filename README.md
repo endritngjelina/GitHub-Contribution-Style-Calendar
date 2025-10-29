@@ -20,6 +20,9 @@
    - `GitHub Contribution Style Calendar 0.html`
    - `GitHub Contribution Style Calendar 1.html`
    - `GitHub Contribution Style Calendar 2.html`
+   - `GitHub Contribution Style Calendar 3.html`
+   - `GitHub Contribution Style Calendar 4.html`
+   - `GitHub Contribution Style Calendar 5.html`
 3. Interact with the calendar to explore contribution data or customize it for your needs.
 
 ## Files
