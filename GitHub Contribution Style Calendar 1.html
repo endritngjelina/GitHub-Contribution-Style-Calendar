@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Style Contribution Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #e6edf3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(22, 27, 34, 0.8);
+            border-radius: 16px;
+            border: 1px solid #30363d;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #238636 0%, #2ea043 100%);
+            padding: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 32px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .control-group {
+            background: rgba(48, 54, 61, 0.3);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .control-group:hover {
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.1);
+        }
+
+        .control-group h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #58a6ff;
+        }
+
+        .habit-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        input, select, button {
+            padding: 10px 14px;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            background: rgba(13, 17, 23, 0.6);
+            color: #e6edf3;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        input[type="text"] {
+            flex: 1;
+        }
+
+        button {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2ea043 0%, #46954a 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: #58a6ff;
+        }
+
+        .color-option.active {
+            border-color: #e6edf3;
+            box-shadow: 0 0 0 2px rgba(230, 237, 243, 0.3);
+        }
+
+        .habits-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .habit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(13, 17, 23, 0.4);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .habit-item:hover {
+            background: rgba(48, 54, 61, 0.4);
+        }
+
+        .habit-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 8px;
+        }
+
+        .delete-btn {
+            background: #da3633;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            background: #f85149;
+        }
+
+        .calendar-section {
+            background: rgba(48, 54, 61, 0.2);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .year-selector {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .calendar-container {
+            position: relative;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 16px;
+            min-width: 800px;
+        }
+
+        .months {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 4px;
+            font-size: 11px;
+            color: #7d8590;
+            margin-bottom: 8px;
+            grid-column: 2;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-rows: repeat(7, 1fr);
+            gap: 2px;
+            font-size: 11px;
+            color: #7d8590;
+            text-align: right;
+            padding-right: 8px;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            grid-template-rows: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background: #161b22;
+            border: 1px solid #21262d;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .day:hover {
+            border-color: #58a6ff;
+            transform: scale(1.2);
+        }
+
+        .day.has-data {
+            border-color: transparent;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            transform: translateY(-10px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(35, 134, 54, 0.1) 100%);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7d8590;
+        }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #7d8590;
+            margin-top: 16px;
+        }
+
+        .legend-item {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            background: #161b22;
+            border: 1px solid #21262d;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .progress-bar {
+            background: rgba(48, 54, 61, 0.5);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636, #2ea043);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Contribution Calendar Pro</h1>
+            <p>Track your habits with GitHub-style visualization</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls">
+                <div class="control-group">
+                    <h3>📝 Add New Habit</h3>
+                    <div class="habit-input">
+                        <input type="text" id="habitName" placeholder="Enter habit name..." maxlength="30">
+                        <button onclick="addHabit()">Add Habit</button>
+                    </div>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- Colors will be generated by JavaScript -->
+                    </div>
+                    <div class="habits-list" id="habitsList">
+                        <!-- Habits will be displayed here -->
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎨 Appearance</h3>
+                    <select id="themeSelect" onchange="changeTheme()">
+                        <option value="github">GitHub Classic</option>
+                        <option value="ocean">Ocean Blue</option>
+                        <option value="forest">Forest Green</option>
+                        <option value="sunset">Sunset Orange</option>
+                        <option value="purple">Purple Haze</option>
+                        <option value="fire">Fire Red</option>
+                    </select>
+                    <div style="margin-top: 12px;">
+                        <label>
+                            <input type="checkbox" id="animationsToggle" checked onchange="toggleAnimations()">
+                            Enable animations
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📊 Quick Stats</h3>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDays">0</div>
+                            <div class="stat-label">Total Days</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="currentStreak">0</div>
+                            <div class="stat-label">Current Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="longestStreak">0</div>
+                            <div class="stat-label">Longest Streak</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <h3>📅 Your Progress</h3>
+                    <select id="yearSelect" onchange="changeYear()">
+                        <!-- Years will be populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar">
+                        <div class="months" id="monthLabels">
+                            <div>Jan</div><div>Feb</div><div>Mar</div><div>Apr</div>
+                            <div>May</div><div>Jun</div><div>Jul</div><div>Aug</div>
+                            <div>Sep</div><div>Oct</div><div>Nov</div><div>Dec</div>
+                        </div>
+                        
+                        <div class="weekdays">
+                            <div></div><div>Mon</div><div></div><div>Wed</div><div></div><div>Fri</div><div></div>
+                        </div>
+                        
+                        <div class="days" id="calendar">
+                            <!-- Calendar days will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <span>Less</span>
+                    <div class="legend-item" style="background: #161b22;"></div>
+                    <div class="legend-item" style="background: #0e4429;"></div>
+                    <div class="legend-item" style="background: #006d32;"></div>
+                    <div class="legend-item" style="background: #26a641;"></div>
+                    <div class="legend-item" style="background: #39d353;"></div>
+                    <span>More</span>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <button onclick="exportData()">📤 Export Data</button>
+                <button onclick="importData()">📥 Import Data</button>
+                <button onclick="clearAllData()">🗑️ Clear All Data</button>
+                <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileImport()">
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Application state
+        let habits = [];
+        let data = {};
+        let currentYear = new Date().getFullYear();
+        let selectedColor = '#238636';
+        let selectedHabit = null;
+        let animationsEnabled = true;
+
+        // Color themes
+        const themes = {
+            github: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+            ocean: ['#161b22', '#0c1445', '#1e40af', '#3b82f6', '#60a5fa'],
+            forest: ['#161b22', '#14532d', '#166534', '#16a34a', '#22c55e'],
+            sunset: ['#161b22', '#7c2d12', '#ea580c', '#f97316', '#fb923c'],
+            purple: ['#161b22', '#581c87', '#7c3aed', '#8b5cf6', '#a78bfa'],
+            fire: ['#161b22', '#7f1d1d', '#dc2626', '#ef4444', '#f87171']
+        };
+
+        // Initialize application
+        function init() {
+            loadData();
+            generateColorPicker();
+            populateYearSelector();
+            renderCalendar();
+            updateStats();
+            renderHabits();
+        }
+
+        // Generate color picker
+        function generateColorPicker() {
+            const colors = ['#238636', '#2ea043', '#58a6ff', '#da3633', '#f85149', '#ff6b35', '#f7931e', '#7209b7', '#a855f7', '#06b6d4', '#10b981', '#f59e0b'];
+            const picker = document.getElementById('colorPicker');
+            picker.innerHTML = '';
+            
+            colors.forEach(color => {
+                const option = document.createElement('div');
+                option.className = 'color-option';
+                option.style.background = color;
+                option.onclick = () => selectColor(color, option);
+                if (color === selectedColor) option.classList.add('active');
+                picker.appendChild(option);
+            });
+        }
+
+        // Select color
+        function selectColor(color, element) {
+            selectedColor = color;
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Add habit
+        function addHabit() {
+            const name = document.getElementById('habitName').value.trim();
+            if (!name) return;
+
+            const habit = {
+                id: Date.now(),
+                name: name,
+                color: selectedColor,
+                created: new Date().toISOString()
+            };
+
+            habits.push(habit);
+            document.getElementById('habitName').value = '';
+            
+            saveData();
+            renderHabits();
+            
+            if (animationsEnabled) {
+                const habitElement = document.querySelector('.habit-item:last-child');
+                if (habitElement) habitElement.classList.add('fade-in');
+            }
+        }
+
+        // Render habits list
+        function renderHabits() {
+            const container = document.getElementById('habitsList');
+            container.innerHTML = '';
+
+            habits.forEach(habit => {
+                const item = document.createElement('div');
+                item.className = 'habit-item';
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="habit-color" style="background: ${habit.color}"></div>
+                        <span>${habit.name}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteHabit(${habit.id})">Delete</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Delete habit
+        function deleteHabit(id) {
+            if (confirm('Are you sure you want to delete this habit?')) {
+                habits = habits.filter(h => h.id !== id);
+                // Remove data for this habit
+                Object.keys(data).forEach(date => {
+                    if (data[date].habitId === id) {
+                        delete data[date];
+                    }
+                });
+                saveData();
+                renderHabits();
+                renderCalendar();
+                updateStats();
+            }
+        }
+
+        // Populate year selector
+        function populateYearSelector() {
+            const select = document.getElementById('yearSelect');
+            const startYear = 2020;
+            const endYear = new Date().getFullYear() + 1;
+            
+            select.innerHTML = '';
+            for (let year = endYear; year >= startYear; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear) option.selected = true;
+                select.appendChild(option);
+            }
+        }
+
+        // Change year
+        function changeYear() {
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+            renderCalendar();
+            updateStats();
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            const startDate = new Date(currentYear, 0, 1);
+            const endDate = new Date(currentYear, 11, 31);
+            
+            // Calculate the first day to show (might be from previous year)
+            const firstDay = new Date(startDate);
+            firstDay.setDate(firstDay.getDate() - firstDay.getDay());
+            
+            const currentDate = new Date(firstDay);
+            const weeks = 53;
+            
+            for (let week = 0; week < weeks; week++) {
+                for (let day = 0; day < 7; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'day';
+                    
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    const dayData = data[dateStr];
+                    
+                    if (dayData && habits.find(h => h.id === dayData.habitId)) {
+                        const habit = habits.find(h => h.id === dayData.habitId);
+                        dayElement.style.backgroundColor = habit.color;
+                        dayElement.classList.add('has-data');
+                        
+                        // Add intensity based on count
+                        const intensity = Math.min(dayData.count / 3, 1);
+                        dayElement.style.opacity = 0.3 + (intensity * 0.7);
+                    }
+                    
+                    dayElement.onclick = () => toggleDay(dateStr, dayElement);
+                    dayElement.onmouseenter = (e) => showTooltip(e, dateStr, dayData);
+                    dayElement.onmouseleave = hideTooltip;
+                    
+                    calendar.appendChild(dayElement);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            }
+        }
+
+        // Toggle day data
+        function toggleDay(dateStr, element) {
+            if (habits.length === 0) {
+                alert('Please add a habit first!');
+                return;
+            }
+
+            // If no habit selected, use the first one
+            const habitToUse = selectedHabit || habits[0];
+            
+            if (data[dateStr] && data[dateStr].habitId === habitToUse.id) {
+                data[dateStr].count++;
+                if (data[dateStr].count > 5) {
+                    delete data[dateStr];
+                }
+            } else {
+                data[dateStr] = {
+                    habitId: habitToUse.id,
+                    count: 1,
+                    date: dateStr
+                };
+            }
+            
+            saveData();
+            renderCalendar();
+            updateStats();
+            
+            if (animationsEnabled) {
+                element.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 150);
+            }
+        }
+
+        // Show tooltip
+        function showTooltip(event, dateStr, dayData) {
+            const tooltip = document.getElementById('tooltip');
+            const date = new Date(dateStr + 'T00:00:00');
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+            
+            let content = formattedDate;
+            if (dayData) {
+                const habit = habits.find(h => h.id === dayData.habitId);
+                if (habit) {
+                    content += `<br>${habit.name}: ${dayData.count} time${dayData.count > 1 ? 's' : ''}`;
+                }
+            } else {
+                content += '<br>No activity';
+            }
+            
+            tooltip.innerHTML = content;
+            tooltip.style.left = event.pageX + 10 + 'px';
+            tooltip.style.top = event.pageY - 40 + 'px';
+            tooltip.classList.add('show');
+        }
+
+        // Hide tooltip
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('show');
+        }
+
+        // Update statistics
+        function updateStats() {
+            const currentYearData = Object.keys(data)
+                .filter(date => date.startsWith(currentYear.toString()))
+                .map(date => data[date]);
+            
+            const totalDays = currentYearData.length;
+            const streak = calculateStreak();
+            const longestStreak = calculateLongestStreak();
+            
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('currentStreak').textContent = streak;
+            document.getElementById('longestStreak').textContent = longestStreak;
+        }
+
+        // Calculate current streak
+        function calculateStreak() {
+            const today = new Date();
+            let streak = 0;
+            
+            for (let i = 0; i < 365; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                if (data[dateStr]) {
+                    streak++;
+                } else if (i > 0) {  // Allow for today to not have data yet
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Calculate longest streak
+        function calculateLongestStreak() {
+            const dates = Object.keys(data).sort();
+            let longest = 0;
+            let current = 0;
+            let lastDate = null;
+            
+            dates.forEach(dateStr => {
+                const date = new Date(dateStr + 'T00:00:00');
+                
+                if (lastDate) {
+                    const daysDiff = (date - lastDate) / (1000 * 60 * 60 * 24);
+                    if (daysDiff === 1) {
+                        current++;
+                    } else {
+                        longest = Math.max(longest, current);
+                        current = 1;
+                    }
+                } else {
+                    current = 1;
+                }
+                
+                lastDate = date;
+            });
+            
+            return Math.max(longest, current);
+        }
+
+        // Change theme
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            const colors = themes[theme];
+            
+            document.documentElement.style.setProperty('--color-0', colors[0]);
+            document.documentElement.style.setProperty('--color-1', colors[1]);
+            document.documentElement.style.setProperty('--color-2', colors[2]);
+            document.documentElement.style.setProperty('--color-3', colors[3]);
+            document.documentElement.style.setProperty('--color-4', colors[4]);
+            
+            // Update legend
+            const legendItems = document.querySelectorAll('.legend-item');
+            legendItems.forEach((item, index) => {
+                if (index < colors.length) {
+                    item.style.background = colors[index];
+                }
+            });
+        }
+
+        // Toggle animations
+        function toggleAnimations() {
+            animationsEnabled = document.getElementById('animationsToggle').checked;
+        }
+
+        // Export data
+        function exportData() {
+            const exportData = {
+                habits: habits,
+                data: data,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `habits-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import data
+        function importData() {
+            document.getElementById('fileInput').click();
+        }
+
+        // Handle file import
+        function handleFileImport() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (importedData.habits && importedData.data) {
+                        if (confirm('This will replace all current data. Continue?')) {
+                            habits = importedData.habits;
+                            data = importedData.data;
+                            saveData();
+                            renderHabits();
+                            renderCalendar();
+                            updateStats();
+                            alert('Data imported successfully!');
+                        }
+                    } else {
+                        alert('Invalid file format!');
+                    }
+                } catch (error) {
+                    alert('Error reading file!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone!')) {
+                habits = [];
+                data = {};
+                saveData();
+                renderHabits();
+                renderCalendar();
+                updateStats();
+            }
+        }
+
+        // Save data to memory (simulating localStorage)
+        function saveData() {
+            // In a real implementation, this would use localStorage
+            // For this demo, data persists only during the session
+            window.appData = { habits, data };
+        }
+
+        // Load data from memory (simulating localStorage)
+        function loadData() {
+            if (window.appData) {
+                habits = window.appData.habits || [];
+                data = window.appData.data || {};
+            }
+            
+            // Add sample data for demonstration
+            if (habits.length === 0) {
+                addSampleData();
+            }
+        }
+
+        // Add sample data for demonstration
+        function addSampleData() {
+            const sampleHabits = [
+                { id: 1, name: 'Exercise', color: '#238636', created: new Date().toISOString() },
+                { id: 2, name: 'Reading', color: '#58a6ff', created: new Date().toISOString() },
+                { id: 3, name: 'Meditation', color: '#f85149', created: new Date().toISOString() }
+            ];
+            
+            habits = sampleHabits;
+            
+            // Generate sample data for the past 3 months
+            const today = new Date();
+            for (let i = 0; i < 90; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // Random chance to have data for each day
+                if (Math.random() > 0.3) {
+                    const habitId = sampleHabits[Math.floor(Math.random() * sampleHabits.length)].id;
+                    const count = Math.floor(Math.random() * 3) + 1;
+                    
+                    data[dateStr] = {
+                        habitId: habitId,
+                        count: count,
+                        date: dateStr
+                    };
+                }
+            }
+            
+            saveData();
+        }
+
+        // Advanced features
+
+        // Habit selection for calendar interaction
+        function selectHabitForCalendar(habitId) {
+            selectedHabit = habits.find(h => h.id === habitId);
+            
+            // Update UI to show selected habit
+            document.querySelectorAll('.habit-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            if (selectedHabit) {
+                const habitElements = document.querySelectorAll('.habit-item');
+                habitElements.forEach(item => {
+                    if (item.textContent.includes(selectedHabit.name)) {
+                        item.classList.add('selected');
+                    }
+                });
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        exportData();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        importData();
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        document.getElementById('habitName').focus();
+                        break;
+                }
+            }
+        });
+
+        // Enhanced statistics
+        function getDetailedStats() {
+            const stats = {
+                totalActiveDays: Object.keys(data).length,
+                habitsCount: habits.length,
+                averagePerWeek: 0,
+                mostActiveMonth: '',
+                leastActiveMonth: '',
+                weekdayDistribution: {},
+                monthlyTotals: {}
+            };
+
+            // Calculate monthly totals
+            Object.keys(data).forEach(dateStr => {
+                const date = new Date(dateStr + 'T00:00:00');
+                const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                stats.monthlyTotals[month] = (stats.monthlyTotals[month] || 0) + data[dateStr].count;
+                stats.weekdayDistribution[weekday] = (stats.weekdayDistribution[weekday] || 0) + 1;
+            });
+
+            // Find most/least active months
+            const months = Object.keys(stats.monthlyTotals);
+            if (months.length > 0) {
+                stats.mostActiveMonth = months.reduce((a, b) => 
+                    stats.monthlyTotals[a] > stats.monthlyTotals[b] ? a : b
+                );
+                stats.leastActiveMonth = months.reduce((a, b) => 
+                    stats.monthlyTotals[a] < stats.monthlyTotals[b] ? a : b
+                );
+            }
+
+            // Calculate weekly average
+            const weeks = Math.ceil(Object.keys(data).length / 7);
+            stats.averagePerWeek = weeks > 0 ? (Object.keys(data).length / weeks).toFixed(1) : 0;
+
+            return stats;
+        }
+
+        // Progressive Web App features
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {
+                // Service worker registration failed, but app still works
+            });
+        }
+
+        // Responsive calendar rendering
+        function adjustCalendarForMobile() {
+            const isMobile = window.innerWidth < 768;
+            const calendar = document.getElementById('calendar');
+            
+            if (isMobile) {
+                calendar.style.gridTemplateColumns = 'repeat(53, 8px)';
+                document.querySelectorAll('.day').forEach(day => {
+                    day.style.width = '8px';
+                    day.style.height = '8px';
+                });
+            } else {
+                calendar.style.gridTemplateColumns = 'repeat(53, 12px)';
+                document.querySelectorAll('.day').forEach(day => {
+                    day.style.width = '12px';
+                    day.style.height = '12px';
+                });
+            }
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', adjustCalendarForMobile);
+
+        // Touch support for mobile
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartY - touchEndY;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe up - could implement year navigation
+                } else {
+                    // Swipe down - could implement year navigation
+                }
+            }
+        }
+
+        // Performance optimization - debounced rendering
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        const debouncedRender = debounce(renderCalendar, 100);
+
+        // Add smooth transitions
+        function addTransitionEffects() {
+            const style = document.createElement('style');
+            style.textContent = `
+                .habit-item.selected {
+                    background: rgba(88, 166, 255, 0.2);
+                    border: 1px solid #58a6ff;
+                    transform: translateX(4px);
+                }
+                
+                .day.highlight {
+                    animation: pulse 0.6s ease-in-out;
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.4); }
+                }
+                
+                .stat-card.updated {
+                    animation: glow 0.8s ease-in-out;
+                }
+                
+                @keyframes glow {
+                    0%, 100% { box-shadow: 0 8px 25px rgba(88, 166, 255, 0.1); }
+                    50% { box-shadow: 0 8px 25px rgba(88, 166, 255, 0.4); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Enhanced habit management
+        function editHabit(id) {
+            const habit = habits.find(h => h.id === id);
+            if (!habit) return;
+            
+            const newName = prompt('Edit habit name:', habit.name);
+            if (newName && newName.trim()) {
+                habit.name = newName.trim();
+                saveData();
+                renderHabits();
+            }
+        }
+
+        // Data validation and error handling
+        function validateData() {
+            let isValid = true;
+            const errors = [];
+            
+            // Validate habits
+            habits.forEach(habit => {
+                if (!habit.id || !habit.name || !habit.color) {
+                    errors.push(`Invalid habit: ${habit.name || 'Unknown'}`);
+                    isValid = false;
+                }
+            });
+            
+            // Validate data entries
+            Object.keys(data).forEach(dateStr => {
+                const entry = data[dateStr];
+                if (!entry.habitId || !entry.count || !entry.date) {
+                    errors.push(`Invalid data entry for date: ${dateStr}`);
+                    isValid = false;
+                }
+                
+                // Check if habit still exists
+                if (!habits.find(h => h.id === entry.habitId)) {
+                    delete data[dateStr]; // Clean up orphaned data
+                }
+            });
+            
+            if (!isValid) {
+                console.warn('Data validation errors:', errors);
+            }
+            
+            return isValid;
+        }
+
+        // Initialize application with error handling
+        function safeInit() {
+            try {
+                init();
+                addTransitionEffects();
+                adjustCalendarForMobile();
+                validateData();
+                
+                // Add success indicator
+                setTimeout(() => {
+                    const header = document.querySelector('.header');
+                    const indicator = document.createElement('div');
+                    indicator.style.cssText = `
+                        position: absolute;
+                        top: 8px;
+                        right: 20px;
+                        background: rgba(46, 160, 67, 0.2);
+                        color: #2ea043;
+                        padding: 4px 8px;
+                        border-radius: 12px;
+                        font-size: 12px;
+                        font-weight: 600;
+                    `;
+                    indicator.textContent = '✓ Ready';
+                    header.appendChild(indicator);
+                    
+                    setTimeout(() => {
+                        indicator.style.opacity = '0';
+                        indicator.style.transition = 'opacity 0.5s ease';
+                    }, 2000);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.body.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #e6edf3;">
+                        <h2>⚠️ Application Error</h2>
+                        <p>Sorry, something went wrong. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Start the application when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', safeInit);
+        } else {
+            safeInit();
+        }
+    </script>
+</body>
+</html>
