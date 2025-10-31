@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitFlow - GitHub Style Contribution Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #656d76;
+            --border-default: #30363d;
+            --accent-emphasis: #1f6feb;
+            --success-emphasis: #238636;
+            --danger-emphasis: #da3633;
+            --warning-emphasis: #fb8500;
+            --contribution-level-0: #161b22;
+            --contribution-level-1: #0e4429;
+            --contribution-level-2: #006d32;
+            --contribution-level-3: #26a641;
+            --contribution-level-4: #39d353;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-default);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-emphasis), var(--success-emphasis));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--success-emphasis);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .controls-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input, select, button {
+            padding: 12px 16px;
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-emphasis);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--accent-emphasis);
+            border-color: var(--accent-emphasis);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #1a5cdb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: var(--border-default);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--text-secondary);
+        }
+
+        .calendar-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .calendar-legend {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-right: 4px;
+        }
+
+        .legend-square {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid var(--border-default);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 15px;
+            overflow-x: auto;
+            min-width: 800px;
+        }
+
+        .month-labels {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 3px;
+            margin-left: 30px;
+            margin-bottom: 5px;
+        }
+
+        .month-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .weekday-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 25px;
+        }
+
+        .weekday-label {
+            height: 13px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .contribution-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 13px);
+            grid-template-rows: repeat(7, 13px);
+            gap: 3px;
+        }
+
+        .contribution-day {
+            width: 13px;
+            height: 13px;
+            border-radius: 2px;
+            border: 1px solid var(--border-default);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .contribution-day:hover {
+            border-color: var(--text-secondary);
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .contribution-day.level-0 { background: var(--contribution-level-0); }
+        .contribution-day.level-1 { background: var(--contribution-level-1); }
+        .contribution-day.level-2 { background: var(--contribution-level-2); }
+        .contribution-day.level-3 { background: var(--contribution-level-3); }
+        .contribution-day.level-4 { background: var(--contribution-level-4); }
+
+        .tooltip {
+            position: absolute;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: var(--text-primary);
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.2s ease;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .habits-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .habit-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .habit-card:hover {
+            border-color: var(--accent-emphasis);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .habit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .habit-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .habit-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+
+        .habit-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .habit-stat-number {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--success-emphasis);
+        }
+
+        .habit-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .delete-btn {
+            background: var(--danger-emphasis);
+            border: none;
+            color: white;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background: #b92e2e;
+            transform: scale(1.05);
+        }
+
+        .analytics-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .analytics-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .analytics-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .analytics-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .analytics-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--success-emphasis);
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-summary {
+                gap: 20px;
+            }
+            
+            .calendar-grid {
+                min-width: 600px;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--accent-emphasis);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">HF</div>
+                    <span>HabitFlow</span>
+                </div>
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalContributions">0</div>
+                        <div class="stat-label">Total Contributions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="currentStreak">0</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="longestStreak">0</div>
+                        <div class="stat-label">Longest Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="controls-section fade-in">
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">Habit/Task Name</label>
+                        <input type="text" id="habitName" placeholder="e.g., Exercise, Reading, Coding">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Select Date</label>
+                        <input type="date" id="dateInput">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Intensity Level</label>
+                        <select id="intensityLevel">
+                            <option value="0">None (0)</option>
+                            <option value="1">Light (1)</option>
+                            <option value="2">Moderate (2)</option>
+                            <option value="3">High (3)</option>
+                            <option value="4">Maximum (4)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Action</label>
+                        <button class="btn-primary" onclick="addContribution()">
+                            <span>📝</span> Log Activity
+                        </button>
+                    </div>
+                </div>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">Color Theme</label>
+                        <div class="color-picker">
+                            <div class="color-option selected" data-theme="github" style="background: #39d353;" title="GitHub Green"></div>
+                            <div class="color-option" data-theme="ocean" style="background: #0ea5e9;" title="Ocean Blue"></div>
+                            <div class="color-option" data-theme="sunset" style="background: #f59e0b;" title="Sunset Orange"></div>
+                            <div class="color-option" data-theme="purple" style="background: #8b5cf6;" title="Purple"></div>
+                            <div class="color-option" data-theme="pink" style="background: #ec4899;" title="Pink"></div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <button class="btn-secondary" onclick="clearAllData()">🗑️ Clear All Data</button>
+                    </div>
+                    <div class="control-group">
+                        <button class="btn-secondary" onclick="generateSampleData()">🎲 Generate Sample Data</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="calendar-section fade-in">
+                <div class="calendar-header">
+                    <h2 class="calendar-title">📅 Contribution Calendar</h2>
+                    <div class="calendar-legend">
+                        <span class="legend-label">Less</span>
+                        <div class="legend-square level-0"></div>
+                        <div class="legend-square level-1"></div>
+                        <div class="legend-square level-2"></div>
+                        <div class="legend-square level-3"></div>
+                        <div class="legend-square level-4"></div>
+                        <span class="legend-label">More</span>
+                    </div>
+                </div>
+                <div class="month-labels" id="monthLabels"></div>
+                <div class="calendar-grid">
+                    <div class="weekday-labels">
+                        <div class="weekday-label">Mon</div>
+                        <div class="weekday-label"></div>
+                        <div class="weekday-label">Wed</div>
+                        <div class="weekday-label"></div>
+                        <div class="weekday-label">Fri</div>
+                        <div class="weekday-label"></div>
+                        <div class="weekday-label">Sun</div>
+                    </div>
+                    <div class="contribution-grid" id="contributionGrid"></div>
+                </div>
+            </section>
+
+            <section class="habits-section" id="habitsSection"></section>
+
+            <section class="analytics-section fade-in">
+                <div class="analytics-card">
+                    <div class="analytics-icon">🔥</div>
+                    <div class="analytics-title">Best Week</div>
+                    <div class="analytics-value" id="bestWeek">0</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">📊</div>
+                    <div class="analytics-title">Average Daily</div>
+                    <div class="analytics-value" id="averageDaily">0.0</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">📈</div>
+                    <div class="analytics-title">This Month</div>
+                    <div class="analytics-value" id="thisMonth">0</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">🎯</div>
+                    <div class="analytics-title">Active Habits</div>
+                    <div class="analytics-value" id="activeHabits">0</div>
+                </div>
+            </section>
+
+            <section class="export-section fade-in">
+                <h3>📤 Export Your Data</h3>
+                <p style="color: var(--text-secondary); margin-top: 10px;">
+                    Export your habit tracking data for backup or analysis
+                </p>
+                <div class="export-buttons">
+                    <button class="btn-primary" onclick="exportToJSON()">📄 Export JSON</button>
+                    <button class="btn-primary" onclick="exportToCSV()">📊 Export CSV</button>
+                    <button class="btn-secondary">
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData()">
+                        📥 Import Data
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        class HabitTracker {
+            constructor() {
+                this.data = this.loadData();
+                this.currentTheme = 'github';
+                this.themes = {
+                    github: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                    ocean: ['#0c1821', '#0d2b3e', '#1e4a5f', '#0ea5e9', '#38bdf8'],
+                    sunset: ['#1a1406', '#4a3511', '#92651d', '#f59e0b', '#fbbf24'],
+                    purple: ['#1a0f2e', '#3c1a5b', '#5b2c87', '#8b5cf6', '#a78bfa'],
+                    pink: ['#2a0e1a', '#5c1a3c', '#8c2459', '#ec4899', '#f472b6']
+                };
+                this.init();
+            }
+
+            init() {
+                this.setTodayDate();
+                this.generateCalendar();
+                this.updateStats();
+                this.updateHabitsSection();
+                this.setupEventListeners();
+                this.updateAnalytics();
+            }
+
+            loadData() {
+                const stored = {};
+                try {
+                    const data = stored;
+                    return data.contributions ? data : { contributions: {}, habits: {} };
+                } catch {
+                    return { contributions: {}, habits: {} };
+                }
+            }
+
+            saveData() {
+                // Data persists in memory during session
+            }
+
+            setTodayDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('dateInput').value = today;
+            }
+
+            generateCalendar() {
+                const grid = document.getElementById('contributionGrid');
+                const monthLabels = document.getElementById('monthLabels');
+                
+                grid.innerHTML = '';
+                monthLabels.innerHTML = '';
+
+                const today = new Date();
+                const startDate = new Date(today);
+                startDate.setDate(today.getDate() - 364);
+
+                const startWeekday = startDate.getDay();
+                const adjustedStart = new Date(startDate);
+                adjustedStart.setDate(startDate.getDate() - startWeekday);
+
+                // Generate month labels
+                let lastMonth = -1;
+                for (let week = 0; week < 53; week++) {
+                    const weekDate = new Date(adjustedStart);
+                    weekDate.setDate(adjustedStart.getDate() + (week * 7));
+                    const month = weekDate.getMonth();
+                    
+                    const monthLabel = document.createElement('div');
+                    monthLabel.className = 'month-label';
+                    
+                    if (month !== lastMonth && weekDate.getDate() <= 7) {
+                        monthLabel.textContent = weekDate.toLocaleDateString('en-US', { month: 'short' });
+                        lastMonth = month;
+                    }
+                    
+                    monthLabels.appendChild(monthLabel);
+                }
+
+                // Generate contribution squares
+                for (let week = 0; week < 53; week++) {
+                    for (let day = 0; day < 7; day++) {
+                        const currentDate = new Date(adjustedStart);
+                        currentDate.setDate(adjustedStart.getDate() + (week * 7) + day);
+                        
+                        if (currentDate > today) continue;
+
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'contribution-day';
+                        dayElement.style.gridColumn = week + 1;
+                        dayElement.style.gridRow = day + 1;
+
+                        const dateString = currentDate.toISOString().split('T')[0];
+                        const contribution = this.data.contributions[dateString] || 0;
+                        
+                        dayElement.classList.add(`level-${Math.min(contribution, 4)}`);
+                        dayElement.dataset.date = dateString;
+                        dayElement.dataset.count = contribution;
+
+                        this.setupTooltip(dayElement, currentDate, contribution);
+                        
+                        grid.appendChild(dayElement);
+                    }
+                }
+
+                this.applyTheme();
+            }
+
+            setupTooltip(element, date, count) {
+                const tooltip = document.getElementById('tooltip');
+                
+                element.addEventListener('mouseenter', (e) => {
+                    const habits = Object.keys(this.data.habits).filter(habit => {
+                        const habitData = this.data.habits[habit];
+                        return habitData[element.dataset.date];
+                    });
+
+                    const dateFormatted = date.toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+
+                    tooltip.innerHTML = `
+                        <strong>${count} contribution${count !== 1 ? 's' : ''}</strong><br>
+                        ${dateFormatted}
+                        ${habits.length > 0 ? '<br>' + habits.join(', ') : ''}
+                    `;
+
+                    const rect = e.target.getBoundingClientRect();
+                    tooltip.style.left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2 + 'px';
+                    tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + 'px';
+                    tooltip.classList.add('show');
+                });
+
+                element.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('show');
+                });
+            }
+
+            addContribution() {
+                const habitName = document.getElementById('habitName').value.trim();
+                const date = document.getElementById('dateInput').value;
+                const intensity = parseInt(document.getElementById('intensityLevel').value);
+
+                if (!habitName || !date) {
+                    alert('Please enter both habit name and date');
+                    return;
+                }
+
+                if (!this.data.habits[habitName]) {
+                    this.data.habits[habitName] = {};
+                }
+
+                this.data.habits[habitName][date] = intensity;
+                
+                // Calculate total contribution for the date
+                const totalForDate = Object.keys(this.data.habits).reduce((sum, habit) => {
+                    return sum + (this.data.habits[habit][date] || 0);
+                }, 0);
+
+                this.data.contributions[date] = totalForDate;
+
+                this.saveData();
+                this.generateCalendar();
+                this.updateStats();
+                this.updateHabitsSection();
+                this.updateAnalytics();
+
+                // Clear form
+                document.getElementById('habitName').value = '';
+                document.getElementById('intensityLevel').value = '0';
+
+                // Show success feedback
+                this.showNotification('✅ Contribution logged successfully!');
+            }
+
+            updateStats() {
+                const contributions = Object.values(this.data.contributions);
+                const total = contributions.reduce((sum, val) => sum + val, 0);
+                
+                document.getElementById('totalContributions').textContent = total;
+                document.getElementById('currentStreak').textContent = this.calculateCurrentStreak();
+                document.getElementById('longestStreak').textContent = this.calculateLongestStreak();
+            }
+
+            calculateCurrentStreak() {
+                const today = new Date();
+                let streak = 0;
+                let currentDate = new Date(today);
+
+                while (true) {
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    if (this.data.contributions[dateString] > 0) {
+                        streak++;
+                        currentDate.setDate(currentDate.getDate() - 1);
+                    } else {
+                        break;
+                    }
+                }
+
+                return streak;
+            }
+
+            calculateLongestStreak() {
+                const dates = Object.keys(this.data.contributions).sort();
+                let longestStreak = 0;
+                let currentStreak = 0;
+
+                for (let i = 0; i < dates.length; i++) {
+                    if (this.data.contributions[dates[i]] > 0) {
+                        currentStreak++;
+                        longestStreak = Math.max(longestStreak, currentStreak);
+                    } else {
+                        currentStreak = 0;
+                    }
+                }
+
+                return longestStreak;
+            }
+
+            updateHabitsSection() {
+                const section = document.getElementById('habitsSection');
+                const habits = Object.keys(this.data.habits);
+
+                if (habits.length === 0) {
+                    section.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No habits tracked yet. Add your first habit above!</p>';
+                    return;
+                }
+
+                section.innerHTML = habits.map(habit => {
+                    const habitData = this.data.habits[habit];
+                    const entries = Object.values(habitData);
+                    const total = entries.reduce((sum, val) => sum + val, 0);
+                    const average = entries.length > 0 ? (total / entries.length).toFixed(1) : 0;
+                    const days = entries.length;
+
+                    return `
+                        <div class="habit-card fade-in">
+                            <div class="habit-header">
+                                <div class="habit-name">${habit}</div>
+                                <button class="delete-btn" onclick="tracker.deleteHabit('${habit}')">×</button>
+                            </div>
+                            <div class="habit-stats">
+                                <div class="habit-stat">
+                                    <div class="habit-stat-number">${total}</div>
+                                    <div class="habit-stat-label">Total Points</div>
+                                </div>
+                                <div class="habit-stat">
+                                    <div class="habit-stat-number">${average}</div>
+                                    <div class="habit-stat-label">Avg Intensity</div>
+                                </div>
+                                <div class="habit-stat">
+                                    <div class="habit-stat-number">${days}</div>
+                                    <div class="habit-stat-label">Days Active</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            deleteHabit(habitName) {
+                if (confirm(`Are you sure you want to delete the habit "${habitName}"? This will remove all associated data.`)) {
+                    delete this.data.habits[habitName];
+                    
+                    // Recalculate contributions
+                    const allDates = new Set();
+                    Object.values(this.data.habits).forEach(habit => {
+                        Object.keys(habit).forEach(date => allDates.add(date));
+                    });
+
+                    // Reset contributions
+                    this.data.contributions = {};
+                    
+                    // Recalculate contributions for all dates
+                    allDates.forEach(date => {
+                        const totalForDate = Object.keys(this.data.habits).reduce((sum, habit) => {
+                            return sum + (this.data.habits[habit][date] || 0);
+                        }, 0);
+                        if (totalForDate > 0) {
+                            this.data.contributions[date] = totalForDate;
+                        }
+                    });
+
+                    this.saveData();
+                    this.generateCalendar();
+                    this.updateStats();
+                    this.updateHabitsSection();
+                    this.updateAnalytics();
+                    this.showNotification('🗑️ Habit deleted successfully!');
+                }
+            }
+
+            updateAnalytics() {
+                const contributions = this.data.contributions;
+                const dates = Object.keys(contributions).sort();
+                
+                // Best week calculation
+                let bestWeek = 0;
+                for (let i = 0; i < dates.length - 6; i++) {
+                    let weekSum = 0;
+                    for (let j = 0; j < 7; j++) {
+                        const date = new Date(dates[i]);
+                        date.setDate(date.getDate() + j);
+                        const dateString = date.toISOString().split('T')[0];
+                        weekSum += contributions[dateString] || 0;
+                    }
+                    bestWeek = Math.max(bestWeek, weekSum);
+                }
+
+                // Average daily
+                const totalContributions = Object.values(contributions).reduce((sum, val) => sum + val, 0);
+                const averageDaily = dates.length > 0 ? (totalContributions / dates.length).toFixed(1) : 0;
+
+                // This month
+                const now = new Date();
+                const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const thisMonth = dates.filter(date => new Date(date) >= thisMonthStart)
+                    .reduce((sum, date) => sum + contributions[date], 0);
+
+                // Active habits
+                const activeHabits = Object.keys(this.data.habits).length;
+
+                document.getElementById('bestWeek').textContent = bestWeek;
+                document.getElementById('averageDaily').textContent = averageDaily;
+                document.getElementById('thisMonth').textContent = thisMonth;
+                document.getElementById('activeHabits').textContent = activeHabits;
+            }
+
+            setupEventListeners() {
+                // Theme selector
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        this.currentTheme = e.target.dataset.theme;
+                        this.applyTheme();
+                    });
+                });
+
+                // Import file trigger
+                document.querySelector('button[onclick*="importFile"]').addEventListener('click', () => {
+                    document.getElementById('importFile').click();
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key) {
+                            case 'Enter':
+                                e.preventDefault();
+                                this.addContribution();
+                                break;
+                            case 's':
+                                e.preventDefault();
+                                this.exportToJSON();
+                                break;
+                        }
+                    }
+                });
+            }
+
+            applyTheme() {
+                const colors = this.themes[this.currentTheme];
+                const root = document.documentElement;
+                
+                colors.forEach((color, index) => {
+                    root.style.setProperty(`--contribution-level-${index}`, color);
+                });
+
+                // Update legend squares
+                document.querySelectorAll('.legend-square').forEach((square, index) => {
+                    square.style.backgroundColor = colors[index];
+                });
+
+                // Update contribution squares
+                document.querySelectorAll('.contribution-day').forEach(day => {
+                    const level = parseInt(day.className.match(/level-(\d)/)[1]);
+                    day.style.backgroundColor = colors[level];
+                });
+            }
+
+            generateSampleData() {
+                if (confirm('This will generate sample data for the past 90 days. Continue?')) {
+                    const habits = ['Exercise', 'Reading', 'Coding', 'Meditation', 'Learning'];
+                    const today = new Date();
+
+                    for (let i = 0; i < 90; i++) {
+                        const date = new Date(today);
+                        date.setDate(today.getDate() - i);
+                        const dateString = date.toISOString().split('T')[0];
+
+                        habits.forEach(habit => {
+                            if (Math.random() > 0.3) { // 70% chance of activity
+                                if (!this.data.habits[habit]) {
+                                    this.data.habits[habit] = {};
+                                }
+                                this.data.habits[habit][dateString] = Math.floor(Math.random() * 4) + 1;
+                            }
+                        });
+                    }
+
+                    // Recalculate contributions
+                    const allDates = new Set();
+                    Object.values(this.data.habits).forEach(habit => {
+                        Object.keys(habit).forEach(date => allDates.add(date));
+                    });
+
+                    allDates.forEach(date => {
+                        const totalForDate = Object.keys(this.data.habits).reduce((sum, habit) => {
+                            return sum + (this.data.habits[habit][date] || 0);
+                        }, 0);
+                        this.data.contributions[date] = totalForDate;
+                    });
+
+                    this.saveData();
+                    this.generateCalendar();
+                    this.updateStats();
+                    this.updateHabitsSection();
+                    this.updateAnalytics();
+                    this.showNotification('🎲 Sample data generated successfully!');
+                }
+            }
+
+            clearAllData() {
+                if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                    this.data = { contributions: {}, habits: {} };
+                    this.saveData();
+                    this.generateCalendar();
+                    this.updateStats();
+                    this.updateHabitsSection();
+                    this.updateAnalytics();
+                    this.showNotification('🗑️ All data cleared successfully!');
+                }
+            }
+
+            exportToJSON() {
+                const dataStr = JSON.stringify(this.data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `habitflow-export-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                this.showNotification('📄 Data exported as JSON!');
+            }
+
+            exportToCSV() {
+                const headers = ['Date', 'Total_Contributions', ...Object.keys(this.data.habits)];
+                const rows = [headers.join(',')];
+
+                const allDates = new Set([
+                    ...Object.keys(this.data.contributions),
+                    ...Object.values(this.data.habits).flatMap(habit => Object.keys(habit))
+                ]);
+
+                Array.from(allDates).sort().forEach(date => {
+                    const row = [
+                        date,
+                        this.data.contributions[date] || 0,
+                        ...Object.keys(this.data.habits).map(habit => 
+                            this.data.habits[habit][date] || 0
+                        )
+                    ];
+                    rows.push(row.join(','));
+                });
+
+                const csvContent = rows.join('\n');
+                const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(csvBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `habitflow-export-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                this.showNotification('📊 Data exported as CSV!');
+            }
+
+            importData() {
+                const file = document.getElementById('importFile').files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (importedData.contributions && importedData.habits) {
+                            if (confirm('This will replace all current data. Continue?')) {
+                                this.data = importedData;
+                                this.saveData();
+                                this.generateCalendar();
+                                this.updateStats();
+                                this.updateHabitsSection();
+                                this.updateAnalytics();
+                                this.showNotification('📥 Data imported successfully!');
+                            }
+                        } else {
+                            alert('Invalid file format. Please select a valid HabitFlow export file.');
+                        }
+                    } catch (error) {
+                        alert('Error reading file. Please make sure it\'s a valid JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+                
+                // Reset file input
+                document.getElementById('importFile').value = '';
+            }
+
+            showNotification(message) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--success-emphasis);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 10000;
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                `;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Global functions for onclick handlers
+        function addContribution() {
+            tracker.addContribution();
+        }
+
+        function clearAllData() {
+            tracker.clearAllData();
+        }
+
+        function generateSampleData() {
+            tracker.generateSampleData();
+        }
+
+        function exportToJSON() {
+            tracker.exportToJSON();
+        }
+
+        function exportToCSV() {
+            tracker.exportToCSV();
+        }
+
+        function importData() {
+            tracker.importData();
+        }
+
+        // Initialize the application
+        const tracker = new HabitTracker();
+
+        // Add some nice loading animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Add smooth scrolling for better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>
