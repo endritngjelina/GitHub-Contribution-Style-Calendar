@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Contribution Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            color: #e6edf3;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff, #79c0ff, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #8b949e;
+            font-weight: 400;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            flex: 1;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .main-content {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(121, 192, 255, 0.05));
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.15);
+            border-color: rgba(88, 166, 255, 0.4);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #58a6ff;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-top: 0.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e6edf3;
+        }
+
+        .year-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .year-btn {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: #58a6ff;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .year-btn:hover {
+            background: rgba(88, 166, 255, 0.2);
+            border-color: rgba(88, 166, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .current-year {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e6edf3;
+        }
+
+        .calendar-container {
+            overflow-x: auto;
+            padding: 1rem 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 1rem;
+            min-width: 800px;
+        }
+
+        .month-labels {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .month-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .weekday-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            justify-content: space-around;
+            padding-top: 1rem;
+        }
+
+        .weekday-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            text-align: right;
+            padding-right: 0.5rem;
+            font-weight: 500;
+        }
+
+        .contribution-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            grid-template-rows: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .contribution-day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .contribution-day:hover {
+            border-color: rgba(240, 246, 252, 0.3);
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .contribution-day.level-0 { background-color: #161b22; }
+        .contribution-day.level-1 { background-color: #0e4429; }
+        .contribution-day.level-2 { background-color: #006d32; }
+        .contribution-day.level-3 { background-color: #26a641; }
+        .contribution-day.level-4 { background-color: #39d353; }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: #8b949e;
+        }
+
+        .legend-levels {
+            display: flex;
+            gap: 2px;
+        }
+
+        .legend-day {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(240, 246, 252, 0.1);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #e6edf3;
+        }
+
+        .habit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-label {
+            font-size: 0.9rem;
+            color: #8b949e;
+            font-weight: 500;
+        }
+
+        .input-field {
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e6edf3;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #2ea043, #238636);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(46, 160, 67, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .habit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .habit-item {
+            background: rgba(13, 17, 23, 0.6);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .habit-item:hover {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .habit-name {
+            font-weight: 500;
+            color: #e6edf3;
+        }
+
+        .habit-streak {
+            font-size: 0.8rem;
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover,
+        .color-option.selected {
+            border-color: #58a6ff;
+            transform: scale(1.1);
+        }
+
+        .theme-github { 
+            --level-0: #161b22; --level-1: #0e4429; --level-2: #006d32; --level-3: #26a641; --level-4: #39d353; 
+        }
+        .theme-blue { 
+            --level-0: #161b22; --level-1: #0a1929; --level-2: #1565c0; --level-3: #1976d2; --level-4: #42a5f5; 
+        }
+        .theme-purple { 
+            --level-0: #161b22; --level-1: #2d1b69; --level-2: #5e35b1; --level-3: #7e57c2; --level-4: #9575cd; 
+        }
+        .theme-orange { 
+            --level-0: #161b22; --level-1: #e65100; --level-2: #f57c00; --level-3: #ff9800; --level-4: #ffb74d; 
+        }
+        .theme-pink { 
+            --level-0: #161b22; --level-1: #ad1457; --level-2: #c2185b; --level-3: #e91e63; --level-4: #f06292; 
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e6edf3;
+        }
+
+        .close-btn {
+            background: #da3633;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Professional Contribution Tracker</h1>
+            <p class="subtitle">Track your habits and goals with a beautiful GitHub-inspired visualization</p>
+        </header>
+
+        <div class="dashboard">
+            <main class="main-content">
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <span class="stat-value" id="totalContributions">0</span>
+                        <span class="stat-label">Total Contributions</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="currentStreak">0</span>
+                        <span class="stat-label">Current Streak</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="longestStreak">0</span>
+                        <span class="stat-label">Longest Streak</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="activeHabits">0</span>
+                        <span class="stat-label">Active Habits</span>
+                    </div>
+                </div>
+
+                <div class="calendar-header">
+                    <h2 class="calendar-title">Activity Overview</h2>
+                    <div class="year-selector">
+                        <button class="year-btn" id="prevYear">← Previous</button>
+                        <span class="current-year" id="currentYear">2024</span>
+                        <button class="year-btn" id="nextYear">Next →</button>
+                    </div>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-grid">
+                        <div class="weekday-labels">
+                            <span class="weekday-label">Sun</span>
+                            <span class="weekday-label">Mon</span>
+                            <span class="weekday-label">Tue</span>
+                            <span class="weekday-label">Wed</span>
+                            <span class="weekday-label">Thu</span>
+                            <span class="weekday-label">Fri</span>
+                            <span class="weekday-label">Sat</span>
+                        </div>
+                        <div class="calendar-weeks">
+                            <div class="month-labels" id="monthLabels"></div>
+                            <div class="contribution-grid" id="contributionGrid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <span>Less</span>
+                    <div class="legend-levels">
+                        <div class="legend-day level-0"></div>
+                        <div class="legend-day level-1"></div>
+                        <div class="legend-day level-2"></div>
+                        <div class="legend-day level-3"></div>
+                        <div class="legend-day level-4"></div>
+                    </div>
+                    <span>More</span>
+                </div>
+            </main>
+
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Add Contribution</h3>
+                    <form class="habit-form" id="contributionForm">
+                        <div class="input-group">
+                            <label class="input-label">Date</label>
+                            <input type="date" class="input-field" id="contributionDate" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Habit/Activity</label>
+                            <select class="input-field" id="habitSelect" required>
+                                <option value="">Select a habit</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Intensity (1-4)</label>
+                            <input type="range" class="input-field" id="intensityRange" min="1" max="4" value="1">
+                            <span id="intensityValue">1</span>
+                        </div>
+                        <button type="submit" class="btn">Log Activity</button>
+                    </form>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Manage Habits</h3>
+                    <form class="habit-form" id="habitForm">
+                        <div class="input-group">
+                            <label class="input-label">Habit Name</label>
+                            <input type="text" class="input-field" id="habitName" placeholder="e.g., Exercise, Reading" required>
+                        </div>
+                        <button type="submit" class="btn">Add Habit</button>
+                    </form>
+                    <div class="habit-list" id="habitList"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Color Theme</h3>
+                    <div class="color-picker-group">
+                        <div class="color-option theme-github selected" data-theme="github" style="background: linear-gradient(45deg, #0e4429, #39d353);"></div>
+                        <div class="color-option theme-blue" data-theme="blue" style="background: linear-gradient(45deg, #0a1929, #42a5f5);"></div>
+                        <div class="color-option theme-purple" data-theme="purple" style="background: linear-gradient(45deg, #2d1b69, #9575cd);"></div>
+                        <div class="color-option theme-orange" data-theme="orange" style="background: linear-gradient(45deg, #e65100, #ffb74d);"></div>
+                        <div class="color-option theme-pink" data-theme="pink" style="background: linear-gradient(45deg, #ad1457, #f06292);"></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+    
+    <div class="modal" id="dayModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalDate"></div>
+            <div id="modalContent"></div>
+            <button class="close-btn" onclick="closeDayModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        class ContributionCalendar {
+            constructor() {
+                this.currentYear = new Date().getFullYear();
+                this.contributions = this.loadContributions();
+                this.habits = this.loadHabits();
+                this.currentTheme = localStorage.getItem('calendar-theme') || 'github';
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.renderCalendar();
+                this.updateStats();
+                this.renderHabits();
+                this.setTheme(this.currentTheme);
+                this.setTodayAsDefault();
+            }
+
+            setupEventListeners() {
+                document.getElementById('prevYear').addEventListener('click', () => this.changeYear(-1));
+                document.getElementById('nextYear').addEventListener('click', () => this.changeYear(1));
+                document.getElementById('contributionForm').addEventListener('submit', (e) => this.handleContributionSubmit(e));
+                document.getElementById('habitForm').addEventListener('submit', (e) => this.handleHabitSubmit(e));
+                document.getElementById('intensityRange').addEventListener('input', (e) => {
+                    document.getElementById('intensityValue').textContent = e.target.value;
+                });
+
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        this.setTheme(option.dataset.theme);
+                    });
+                });
+            }
+
+            setTodayAsDefault() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('contributionDate').value = today;
+            }
+
+            changeYear(delta) {
+                this.currentYear += delta;
+                document.getElementById('currentYear').textContent = this.currentYear;
+                this.renderCalendar();
+                this.updateStats();
+            }
+
+            renderCalendar() {
+                const grid = document.getElementById('contributionGrid');
+                const monthLabels = document.getElementById('monthLabels');
+                
+                grid.innerHTML = '';
+                monthLabels.innerHTML = '';
+
+                const startDate = new Date(this.currentYear, 0, 1);
+                const endDate = new Date(this.currentYear, 11, 31);
+                const startOfWeek = new Date(startDate);
+                startOfWeek.setDate(startDate.getDate() - startDate.getDay());
+
+                let currentDate = new Date(startOfWeek);
+                let weekCount = 0;
+                let lastMonth = -1;
+
+                for (let week = 0; week < 53; week++) {
+                    const monthAtWeekStart = currentDate.getMonth();
+                    if (monthAtWeekStart !== lastMonth) {
+                        const monthDiv = document.createElement('div');
+                        monthDiv.className = 'month-label';
+                        monthDiv.textContent = currentDate.toLocaleDateString('en-US', { month: 'short' });
+                        monthDiv.style.gridColumn = `${week + 1}`;
+                        monthLabels.appendChild(monthDiv);
+                        lastMonth = monthAtWeekStart;
+                    }
+
+                    for (let day = 0; day < 7; day++) {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'contribution-day';
+                        
+                        const dateStr = currentDate.toISOString().split('T')[0];
+                        const contribution = this.contributions[dateStr] || 0;
+                        const level = Math.min(4, Math.max(0, contribution));
+                        
+                        dayElement.classList.add(`level-${level}`);
+                        dayElement.dataset.date = dateStr;
+                        dayElement.dataset.contributions = contribution;
+
+                        if (currentDate >= startDate && currentDate <= endDate) {
+                            dayElement.style.opacity = '1';
+                        } else {
+                            dayElement.style.opacity = '0.3';
+                        }
+
+                        this.addDayEventListeners(dayElement);
+                        grid.appendChild(dayElement);
+                        
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                    weekCount++;
+                }
+            }
+
+            addDayEventListeners(dayElement) {
+                dayElement.addEventListener('mouseenter', (e) => {
+                    const date = new Date(e.target.dataset.date);
+                    const contributions = e.target.dataset.contributions;
+                    const tooltip = document.getElementById('tooltip');
+                    
+                    tooltip.innerHTML = `
+                        <strong>${date.toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}</strong><br>
+                        ${contributions} contribution${contributions !== '1' ? 's' : ''}
+                    `;
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+                    tooltip.style.top = `${rect.top - 10}px`;
+                    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+                    tooltip.classList.add('show');
+                });
+
+                dayElement.addEventListener('mouseleave', () => {
+                    document.getElementById('tooltip').classList.remove('show');
+                });
+
+                dayElement.addEventListener('click', (e) => {
+                    this.showDayModal(e.target.dataset.date);
+                });
+            }
+
+            showDayModal(dateStr) {
+                const date = new Date(dateStr);
+                const modal = document.getElementById('dayModal');
+                const modalDate = document.getElementById('modalDate');
+                const modalContent = document.getElementById('modalContent');
+                
+                modalDate.textContent = date.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const contributions = this.contributions[dateStr] || 0;
+                modalContent.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Contributions: ${contributions}</strong>
+                    </div>
+                    <div style="color: #8b949e; font-size: 0.9rem;">
+                        Click on a day to view detailed activity information.
+                        Use the sidebar to log new activities for this date.
+                    </div>
+                `;
+
+                modal.classList.add('show');
+            }
+
+            handleContributionSubmit(e) {
+                e.preventDefault();
+                const date = document.getElementById('contributionDate').value;
+                const habit = document.getElementById('habitSelect').value;
+                const intensity = parseInt(document.getElementById('intensityRange').value);
+
+                if (!date || !habit) return;
+
+                if (!this.contributions[date]) {
+                    this.contributions[date] = 0;
+                }
+                this.contributions[date] += intensity;
+
+                this.saveContributions();
+                this.renderCalendar();
+                this.updateStats();
+                
+                // Reset form
+                document.getElementById('intensityRange').value = '1';
+                document.getElementById('intensityValue').textContent = '1';
+                
+                // Show success feedback
+                this.showNotification('Activity logged successfully!');
+            }
+
+            handleHabitSubmit(e) {
+                e.preventDefault();
+                const habitName = document.getElementById('habitName').value.trim();
+                
+                if (!habitName || this.habits.includes(habitName)) return;
+
+                this.habits.push(habitName);
+                this.saveHabits();
+                this.renderHabits();
+                this.updateStats();
+                
+                document.getElementById('habitName').value = '';
+                this.showNotification('Habit added successfully!');
+            }
+
+            renderHabits() {
+                const habitList = document.getElementById('habitList');
+                const habitSelect = document.getElementById('habitSelect');
+                
+                habitList.innerHTML = '';
+                habitSelect.innerHTML = '<option value="">Select a habit</option>';
+
+                this.habits.forEach((habit, index) => {
+                    // Add to list
+                    const habitItem = document.createElement('div');
+                    habitItem.className = 'habit-item';
+                    habitItem.innerHTML = `
+                        <span class="habit-name">${habit}</span>
+                        <button onclick="calendar.removeHabit(${index})" style="background: #da3633; border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Remove</button>
+                    `;
+                    habitList.appendChild(habitItem);
+
+                    // Add to select
+                    const option = document.createElement('option');
+                    option.value = habit;
+                    option.textContent = habit;
+                    habitSelect.appendChild(option);
+                });
+            }
+
+            removeHabit(index) {
+                this.habits.splice(index, 1);
+                this.saveHabits();
+                this.renderHabits();
+                this.updateStats();
+                this.showNotification('Habit removed successfully!');
+            }
+
+            updateStats() {
+                const currentYearContributions = Object.entries(this.contributions)
+                    .filter(([date]) => new Date(date).getFullYear() === this.currentYear)
+                    .reduce((sum, [, count]) => sum + count, 0);
+
+                const currentStreak = this.calculateCurrentStreak();
+                const longestStreak = this.calculateLongestStreak();
+
+                document.getElementById('totalContributions').textContent = currentYearContributions;
+                document.getElementById('currentStreak').textContent = currentStreak;
+                document.getElementById('longestStreak').textContent = longestStreak;
+                document.getElementById('activeHabits').textContent = this.habits.length;
+            }
+
+            calculateCurrentStreak() {
+                const today = new Date();
+                let streak = 0;
+                let currentDate = new Date(today);
+
+                while (true) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    if (this.contributions[dateStr] > 0) {
+                        streak++;
+                        currentDate.setDate(currentDate.getDate() - 1);
+                    } else {
+                        break;
+                    }
+                }
+
+                return streak;
+            }
+
+            calculateLongestStreak() {
+                const dates = Object.keys(this.contributions)
+                    .filter(date => this.contributions[date] > 0)
+                    .sort();
+
+                if (dates.length === 0) return 0;
+
+                let maxStreak = 1;
+                let currentStreak = 1;
+
+                for (let i = 1; i < dates.length; i++) {
+                    const prevDate = new Date(dates[i - 1]);
+                    const currDate = new Date(dates[i]);
+                    const diffTime = currDate.getTime() - prevDate.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 1) {
+                        currentStreak++;
+                        maxStreak = Math.max(maxStreak, currentStreak);
+                    } else {
+                        currentStreak = 1;
+                    }
+                }
+
+                return maxStreak;
+            }
+
+            setTheme(theme) {
+                this.currentTheme = theme;
+                document.body.className = `theme-${theme}`;
+                localStorage.setItem('calendar-theme', theme);
+
+                const themeColors = {
+                    github: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                    blue: ['#161b22', '#0a1929', '#1565c0', '#1976d2', '#42a5f5'],
+                    purple: ['#161b22', '#2d1b69', '#5e35b1', '#7e57c2', '#9575cd'],
+                    orange: ['#161b22', '#e65100', '#f57c00', '#ff9800', '#ffb74d'],
+                    pink: ['#161b22', '#ad1457', '#c2185b', '#e91e63', '#f06292']
+                };
+
+                const colors = themeColors[theme];
+                document.documentElement.style.setProperty('--level-0', colors[0]);
+                document.documentElement.style.setProperty('--level-1', colors[1]);
+                document.documentElement.style.setProperty('--level-2', colors[2]);
+                document.documentElement.style.setProperty('--level-3', colors[3]);
+                document.documentElement.style.setProperty('--level-4', colors[4]);
+
+                // Update contribution days with new colors
+                document.querySelectorAll('.contribution-day').forEach(day => {
+                    const level = [...day.classList].find(cls => cls.startsWith('level-'));
+                    if (level) {
+                        const levelNum = level.split('-')[1];
+                        day.style.backgroundColor = colors[levelNum];
+                    }
+                });
+
+                // Update legend
+                document.querySelectorAll('.legend-day').forEach((day, index) => {
+                    day.style.backgroundColor = colors[index];
+                });
+            }
+
+            showNotification(message) {
+                // Create and show a temporary notification
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #238636, #2ea043);
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    z-index: 3000;
+                    animation: slideInRight 0.3s ease-out;
+                    box-shadow: 0 4px 20px rgba(46, 160, 67, 0.3);
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease-out';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            loadContributions() {
+                const saved = localStorage.getItem('contributions');
+                return saved ? JSON.parse(saved) : {};
+            }
+
+            saveContributions() {
+                localStorage.setItem('contributions', JSON.stringify(this.contributions));
+            }
+
+            loadHabits() {
+                const saved = localStorage.getItem('habits');
+                return saved ? JSON.parse(saved) : ['Exercise', 'Reading', 'Coding', 'Meditation'];
+            }
+
+            saveHabits() {
+                localStorage.setItem('habits', JSON.stringify(this.habits));
+            }
+
+            // Export functionality for data backup
+            exportData() {
+                const data = {
+                    contributions: this.contributions,
+                    habits: this.habits,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `contribution-data-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // Import functionality for data restore
+            importData(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.contributions && data.habits) {
+                            this.contributions = data.contributions;
+                            this.habits = data.habits;
+                            this.saveContributions();
+                            this.saveHabits();
+                            this.renderCalendar();
+                            this.renderHabits();
+                            this.updateStats();
+                            this.showNotification('Data imported successfully!');
+                        }
+                    } catch (error) {
+                        this.showNotification('Error importing data: Invalid file format');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Global functions for modal and calendar interaction
+        function closeDayModal() {
+            document.getElementById('dayModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('dayModal').addEventListener('click', (e) => {
+            if (e.target.id === 'dayModal') {
+                closeDayModal();
+            }
+        });
+
+        // Add CSS animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+
+            .contribution-day:hover {
+                transform: scale(1.3) !important;
+                z-index: 100;
+                box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+            }
+
+            .habit-item button:hover {
+                background: #b91c1c !important;
+                transform: translateY(-1px);
+            }
+
+            .input-field:hover {
+                border-color: rgba(88, 166, 255, 0.5);
+            }
+
+            .calendar-container::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .calendar-container::-webkit-scrollbar-track {
+                background: #161b22;
+                border-radius: 4px;
+            }
+
+            .calendar-container::-webkit-scrollbar-thumb {
+                background: #30363d;
+                border-radius: 4px;
+            }
+
+            .calendar-container::-webkit-scrollbar-thumb:hover {
+                background: #58a6ff;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the calendar
+        const calendar = new ContributionCalendar();
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        calendar.changeYear(-1);
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        calendar.changeYear(1);
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        calendar.exportData();
+                        break;
+                }
+            }
+            if (e.key === 'Escape') {
+                closeDayModal();
+            }
+        });
+
+        // Add some sample data for demonstration
+        if (Object.keys(calendar.contributions).length === 0) {
+            const today = new Date();
+            const sampleDates = [];
+            
+            // Generate some realistic sample data
+            for (let i = 0; i < 365; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                
+                // Random activity with weighted probability
+                if (Math.random() < 0.7) {
+                    const intensity = Math.random() < 0.3 ? 4 : 
+                                    Math.random() < 0.5 ? 3 : 
+                                    Math.random() < 0.7 ? 2 : 1;
+                    
+                    const dateStr = date.toISOString().split('T')[0];
+                    calendar.contributions[dateStr] = intensity;
+                }
+            }
+            
+            calendar.saveContributions();
+            calendar.renderCalendar();
+            calendar.updateStats();
+        }
+
+        // Performance optimization: Lazy load calendar rendering
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.stat-card, .sidebar-section').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Add subtle parallax effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const header = document.querySelector('.header');
+            if (header) {
+                header.style.transform = `translateY(${scrolled * 0.1}px)`;
+            }
+        });
+
+        console.log('🎉 Professional Contribution Calendar loaded successfully!');
+        console.log('💡 Keyboard shortcuts: Ctrl+← (previous year), Ctrl+→ (next year), Ctrl+S (export data)');
+    </script>
+</body>
+</html>
